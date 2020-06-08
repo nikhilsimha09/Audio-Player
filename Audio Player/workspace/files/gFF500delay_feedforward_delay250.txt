@@ -1,0 +1,4 @@
+delay;feedforward;0;2.500000e-01;simple echo filter
+0
+1;5.000000e-01;
+1;0;

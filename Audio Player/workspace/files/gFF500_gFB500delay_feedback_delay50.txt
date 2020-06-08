@@ -1,0 +1,4 @@
+delay;feedback;0;5.000000e-02;multiple echo feedback
+0
+1;0;
+1;-5.000000e-01;

@@ -1,0 +1,52 @@
+// pattern for the sound file library functions of libsndfile
+
+	// soundfile variables
+		SF_INFO sfinfo;
+		SNDFILE*  sf;
+
+		// get data from File
+		string soundfile="..\\Sounds\\funny-voices.wav";
+		sf= sf_open(soundfile.c_str(), SFM_READ, &sfinfo);
+
+		if(!sf)
+		{
+			cout << sf_strerror(sf) << endl << "Bye!" << endl;
+			return;
+		}
+
+		// print file info
+		cout << "File: " << soundfile << "[fs=" << sfinfo.samplerate << "Hz, Channels=";
+		cout << sfinfo.channels << ", total number of frames=" << sfinfo.frames << "]" << endl;
+
+		// configure sample buffer
+		sf_count_t framesPerBlock=(int)(sfinfo.samplerate/8); // 1s/8=125ms per block
+		sf_count_t sblockSize=sfinfo.channels*framesPerBlock; // total number of samples per block
+		float* sbuf=new float[sblockSize];
+		float smin=0.,smax=0.;
+
+		// reads the number of frames passed (1 frame == 1 for mono, 2 for stereo, channel number in general)
+		sf_count_t readSize=sf_readf_float(sf, sbuf, framesPerBlock);
+
+		// print minimum and maximum sample value
+		while( framesPerBlock == readSize)
+		{
+			for(int i=0; i < sblockSize; i++)
+			{
+				if(sbuf[i] < smin)smin=sbuf[i];
+				else if(sbuf[i] > smax)smax=sbuf[i];
+			}
+			readSize=sf_readf_float(sf, sbuf, framesPerBlock);
+		}
+
+		// process the rest of data
+		cout << "Frames per block/frames per last block: " << framesPerBlock <<"/"<< readSize << endl;
+		for(int i=0; i < readSize; i++)
+		{
+			if(sbuf[i] < smin)smin=sbuf[i];
+			else if(sbuf[i] > smax)smax=sbuf[i];
+		}
+
+		cout << endl << "Minimum: " << smin << endl << "Maximum: " << smax << endl;
+
+	    delete[]sbuf;
+		sf_close(sf) ;
